@@ -5,8 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fair Trade Coffee</title>
-    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="style.css">
+    <!--Import Google Icon Font-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <!--Let browser know website is optimized for mobile-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 </head>
 
 <body>
@@ -16,90 +20,269 @@
         <p style="text-align: center;">Prove the authenticity of coffee using the Ethereum blockchain.</p>
     </div>
 
-    <div id="ftc-harvest">
-        <h2>Product Overview</h2>
-        <div class="form-group">
-            SKU
-            <br>
-            <input class="input-field" type="number" id="sku" name="sku" value=1><br>
-            UPC
-            <br>
-            <input type="number" id="upc" name="upc" value=1><br>
-            Current Owner ID
-            <br>
-            <input type="text" id="ownerID" name="ownerID" value="0x963865f57804b38459dd4b2da2f760211a200438" size="50"><br>
-            <div class=button-div>
-                <button class="btn-fetchOne" id="button" type="button" data-id="9">Fetch Data 1</button>
-                <button class="btn-fetchTwo" id="button" type="button" data-id="10">Fetch Data 2</button>
+    <div class="row">
+        <div class="card col s12">
+            <div class="card-content">
+                <h3>User</h3>
+
+                <form action="#">
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <input disabled value="" id="user_address" type="text" class="">
+                            <label for="user_address">Address</label>
+                        </div>
+                    </div>
+                    <h5>Roles</h5>
+                    <label class="row">
+                        <div class="input-field col s3">
+                            <label>
+                                <input id="role_farmer" type="checkbox" class="">
+                                <span>Farmer</span>
+                            </label>
+                        </div>
+                        <div class="input-field col s3">
+                            <label>
+                                <input id="role_distributor" type="checkbox" class="">
+                                <span>Distributor</span>
+                            </label>
+                        </div>
+                        <div class="input-field col s3">
+                            <label>
+                                <input id="role_retailer" type="checkbox" class="">
+                                <span>Retailer</span>
+                            </label>
+                        </div>
+                        <div class="input-field col s3">
+                            <label>
+                                <input id="role_consumer" type="checkbox" class="">
+                                <span>Consumer</span>
+                            </label>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
-        <div class=form-break></div>
-        <h2>Farm Details</h2>
-        <div class="form-group">
-            Farmer ID
-            <br>
-            <input type="text" id="originFarmerID" name="originFarmerID" value="0x99c289eb2aacec289631a5ddf62cf27a63d4494f"
-                size="50"><br>
-            Farm Name
-            <br>
-            <input type="text" id="originFarmName" name="originFarmName" value="John Doe"><br>
-            Farm Information
-            <br>
-            <input type="text" id="originFarmInformation" name="originFarmInformation" value="Yarra Valley"><br>
-            Farm Latitude
-            <br>
-            <input type="text" id="originFarmLatitude" name="originFarmLatitude" value="-38.239770"><br>
-            Farm Longitude
-            <br>
-            <input type="text" id="originFarmLongitude" name="originFarmLongitude" value="144.341490"><br>
-            <br>
-            <button class="btn-harvest" id="button" type="button" data-id="1">Harvest</button>
-            <button class="btn-process" id="button" type="button" data-id="2">Process</button>
-            <button class="btn-pack" id="button" type="button" data-id="3">Pack</button>
-            <button class="btn-forsale" id="button" type="button" data-id="4">ForSale</button>
-        </div>
-        <div class=form-break></div>
-        <h2>Product Details</h2>
-        <div class="form-group">
-            Product Notes
-            <br>
-            <input type="text" id="productNotes" name="productNotes" value="Best beans for Espresso" size="60"><br>
-            Product Price
-            <br>
-            <input type="number" id="productPrice" name="productPrice" value=1>ETH<br>
-            Distributor ID
-            <br>
-            <input type="text" id="distributorID" name="distributorID" value="0xf1b1bcd24dad92303dd9fe78be639f7bcf9c238d"
-                size="50">
-            <br>
-            Retailer ID
-            <br>
-            <input type="text" id="retailerID" name="retailerID" value="0x0fb2bfefd526966c87efa19f6693d50971763fc2"
-                size="50"><br>
-            Distributor ID
-            <br>
-            <input type="text" id="consumerID" name="consumerID" value="0x5d777e9127b28fb119e81a6304278a0a21bef1c4"
-                size="50"><br>
-            <br>
-            <button class="btn-buy" id="button" type="button" data-id="5">Buy</button>
-            <button class="btn-ship" id="button" type="button" data-id="6">Ship</button>
-            <button class="btn-receive" id="button" type="button" data-id="7">Receive</button>
-            <button class="btn-purchase" id="button" type="button" data-id="8">Purchase</button>
-        </div>
-        <div class=form-break></div>
-        <hr>
     </div>
 
-    <h2>Transaction History<span id="ftc-history"></span></h2>
-    <div>
-        <ul id="ftc-events">
-            <!-- Events will appear here from app.js -->
-        </ul>
-        <br>
-        <hr>
+    <div class="row">
+        <div class="card col s6">
+            <div class="card-content">
+                <h3>Product</h3>
+            </div>
+            <div class="card-content">
+                <form>
+                    <div class="row">
+                        <div class="input-field col s6">
+                            <input value="1" id="sku" type="number" class="">
+                            <label for="sku">SKU</label>
+                        </div>
+                        <div class="input-field col s6">
+                            <input value="1" id="upc" type="number" class="">
+                            <label for="upc">UPC</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <input disabled value="" id="owner_id" type="text" class="">
+                            <label for="owner_id">Owner ID</label>
+                        </div>
+                        <div class="input-field col s12">
+                            <input disabled value="" id="origin_farm_name" type="text" class="">
+                            <label for="origin_farm_name">Origin Farm Name</label>
+                        </div>
+                        <div class="input-field col s6">
+                            <input disabled value="" id="origin_farm_longitude" type="text" class="">
+                            <label for="origin_farm_longitude">Origin Farm Longitude</label>
+                        </div>
+                        <div class="input-field col s6">
+                            <input disabled value="" id="origin_farm_latitude" type="text" class="">
+                            <label for="origin_farm_latitude">Origin Farm Latitude</label>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <input disabled value="" id="product_id" type="text" class="">
+                            <label for="product_id">Product ID</label>
+                        </div>
+                        <div class="input-field col s12">
+                            <input disabled value="" id="product_notes" type="text" class="">
+                            <label for="product_notes">Product Notes</label>
+                        </div>
+                        <div class="input-field col s6">
+                            <input disabled value="" id="product_price" type="text" class="">
+                            <label for="product_price">Product Price</label>
+                        </div>
+                        <div class="input-field col s6">
+                            <input disabled value="" id="item_state" type="text" class="">
+                            <label for="item_state">Item State</label>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <input disabled value="" id="origin_farmer_id" type="text" class="">
+                            <label for="origin_farmer_id">Origin Farmer ID</label>
+                        </div>
+                        <div class="input-field col s12">
+                            <input disabled value="" id="distributer_id" type="text" class="">
+                            <label for="distributer_id">Distributor ID</label>
+                        </div>
+                        <div class="input-field col s12">
+                            <input disabled value="" id="retailer_id" type="text" class="">
+                            <label for="retailer_id">Retailer Notes</label>
+                        </div>
+                        <div class="input-field col s12">
+                            <input disabled value="" id="consumer_id" type="text" class="">
+                            <label for="consumer_id">Consumer ID</label>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!--<h5>History</h5>
+                    <ul id="ftc-events">
+
+                   </ul> -->
+                </form>
+            </div>
+        </div>
+
+        <div class="col s1"></div>
+
+        <div class="card col s5">
+            <div class="card-content">
+                <h3>Actions</h3>
+            </div>
+            <div class="card-tabs">
+                <ul class="tabs tabs-fixed-width">
+                    <li class="tab"><a class="active" href="#test4">Farmer</a></li>
+                    <li class="tab"><a href="#test5">Distributor</a></li>
+                    <li class="tab"><a href="#test6">Retailer</a></li>
+                    <li class="tab"><a href="#test7">Consumer</a></li>
+                </ul>
+            </div>
+            <div class="card-content lighten-4">
+                <div id="test4">
+                    <p id="no_farmer_info"><i class="material-icons">info</i> <span>You are not a farmer.</span></p>
+                    <form id="harvest_form">
+                        <div class="row">
+                            <p>The SKU and UPC selected on the left are not used yet. You can enter a new harvested product.</p>
+                            <div class="input-field col s12">
+                                <input value="" id="harvest_origin_farm_name" type="text" class="">
+                                <label for="harvest_origin_farm_name">Origin Farm Name</label>
+                            </div>
+                            <div class="input-field col s12">
+                                <input value="" id="harvest_origin_farm_information" type="text" class="">
+                                <label for="harvest_origin_farm_information">Origin Farm Information</label>
+                            </div>
+                            <div class="input-field col s6">
+                                <input value="" id="harvest_origin_farm_longitude" type="text" class="">
+                                <label for="harvest_origin_farm_longitude">Origin Farm Longitude</label>
+                            </div>
+                            <div class="input-field col s6">
+                                <input value="" id="harvest_origin_farm_latitude" type="text" class="">
+                                <label for="harvest_origin_farm_latitude">Origin Farm Latitude</label>
+                            </div>
+                            <div class="input-field col s12">
+                                <input value="" id="harvest_origin_product_notes" type="text" class="">
+                                <label for="harvest_origin_product_notes">Product Notes</label>
+                            </div>
+                        </div>
+                        <button id="harvest_button">Harvest</button>
+                    </form>
+                    <form id="process_form">
+                        <div class="row">
+                            <p>This item has been harvested before. It can now be processed.</p>
+                        </div>
+                        <button id="process_button">Process</button>
+                    </form>
+                    <form id="pack_form">
+                        <div class="row">
+                            <p>This item has been processed before. It can now be packed.</p>
+                        </div>
+                        <button id="pack_button">Pack</button>
+                    </form>
+                    <form id="sell_form">
+                        <div class="row">
+                            <p>This item has been packed before. It can now be sold.</p>
+                        </div>
+                        <div class="input-field col s12">
+                            <input value="1" id="sell_product_price" type="number" class="">
+                            <label for="sell_product_price">Product Price</label>
+                        </div>
+                        <button id="sell_button">Sell</button>
+                    </form>
+                    <form id="farmer_done_form">
+                        <div class="row">
+                            <p>This item has been sold before. Since you are a farmer the item is done for you.</p>
+                        </div>
+                    </form>
+                </div>
+                <div id="test5">
+                    <p id="no_distributor_info"><i class="material-icons">info</i> <span>You are not a distributor.</span></p>
+                    <form id="buy_form">
+                        <div class="row">
+                            <p>This item has been put on sale before. It can now be bought.</p>
+                        </div>
+                        <button id="buy_button">Buy</button>
+                    </form>
+                    <form id="ship_form">
+                        <div class="row">
+                            <p>This item has been bought before. It can now be shipped.</p>
+                        </div>
+                        <button id="ship_button">Ship</button>
+                    </form>
+                    <form id="distributor_done_form">
+                        <div class="row">
+                            <p>Since you are a distributor the item is done for you.</p>
+                        </div>
+                    </form>
+                </div>
+                <div id="test6">
+                    <p id="no_retailer_info"><i class="material-icons">info</i> <span>You are not a retailer.</span></p>
+                    <form id="receive_form">
+                        <div class="row">
+                            <p>This item has been shipped before. It can now be received.</p>
+                        </div>
+                        <button id="receive_button">Receive</button>
+                    </form>
+                    <form id="retailer_done_form">
+                        <div class="row">
+                            <p>Since you are a retailer the item is done for you.</p>
+                        </div>
+                    </form>
+                </div>
+                <div id="test7">
+                    <p id="no_consumer_info"><i class="material-icons">info</i> <span>You are not a consumer.</span></p>
+                    <form id="purchase_form">
+                        <div class="row">
+                            <p>This item has been received before. It can now be purchased.</p>
+                        </div>
+                        <button id="purchase_button">Purchase</button>
+                    </form>
+                    <form id="consumer_done_form">
+                        <div class="row">
+                            <p>Since you are a consumer the item is done for you.</p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
     <script src="app.js"></script>
 </body>
 

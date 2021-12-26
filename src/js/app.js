@@ -6,57 +6,18 @@ const App = {
     web3Provider: null,
     contracts: {},
     emptyAddress: "0x0000000000000000000000000000000000000000",
-    sku: 0,
-    upc: 0,
     metamaskAccountID: "0x0000000000000000000000000000000000000000",
-    ownerID: "0x0000000000000000000000000000000000000000",
-    originFarmerID: "0x0000000000000000000000000000000000000000",
-    originFarmName: null,
-    originFarmInformation: null,
-    originFarmLatitude: null,
-    originFarmLongitude: null,
-    productNotes: null,
-    productPrice: 0,
-    distributorID: "0x0000000000000000000000000000000000000000",
-    retailerID: "0x0000000000000000000000000000000000000000",
-    consumerID: "0x0000000000000000000000000000000000000000",
+
+    currentItemExists: false,
+    currentProductState: -1,
 
     init: async function () {
-        App.readForm();
+        // Setup UI
+
+        $('.tabs').tabs();
+
         /// Setup access to blockchain
         return await App.initWeb3();
-    },
-
-    readForm: function () {
-        App.sku = $("#sku").val();
-        App.upc = $("#upc").val();
-        App.ownerID = $("#ownerID").val();
-        App.originFarmerID = $("#originFarmerID").val();
-        App.originFarmName = $("#originFarmName").val();
-        App.originFarmInformation = $("#originFarmInformation").val();
-        App.originFarmLatitude = $("#originFarmLatitude").val();
-        App.originFarmLongitude = $("#originFarmLongitude").val();
-        App.productNotes = $("#productNotes").val();
-        App.productPrice = $("#productPrice").val();
-        App.distributorID = $("#distributorID").val();
-        App.retailerID = $("#retailerID").val();
-        App.consumerID = $("#consumerID").val();
-
-        console.log(
-            App.sku,
-            App.upc,
-            App.ownerID, 
-            App.originFarmerID, 
-            App.originFarmName, 
-            App.originFarmInformation, 
-            App.originFarmLatitude, 
-            App.originFarmLongitude, 
-            App.productNotes, 
-            App.productPrice, 
-            App.distributorID, 
-            App.retailerID, 
-            App.consumerID
-        );
     },
 
     initWeb3: async function () {
@@ -84,7 +45,7 @@ const App = {
             App.web3 = new Web3(App.web3Provider);
         }
 
-        App.getMetaskAccountID();
+        await App.getMetaskAccountID();
 
         App.networkId = await App.web3.eth.net.getId();
         App.deployedNetwork = SupplyChainArtifact.networks[App.networkId];
@@ -92,9 +53,9 @@ const App = {
         return App.initSupplyChain();
     },
 
-    getMetaskAccountID: function () {
+    getMetaskAccountID: async function () {
         // Retrieving accounts
-        App.web3.eth.getAccounts(function(err, res) {
+        await App.web3.eth.getAccounts(function(err, res) {
             if (err) {
                 console.log('Error:',err);
                 return;
@@ -102,7 +63,9 @@ const App = {
             console.log('getMetaskID:',res);
             App.metamaskAccountID = res[0];
 
-        })
+            $("#user_address").val(App.metamaskAccountID);
+            M.updateTextFields();
+        });
     },
 
     initSupplyChain: function () {
@@ -115,206 +78,313 @@ const App = {
         App.fetchItemBufferOne();
         App.fetchItemBufferTwo();
         App.fetchEvents();
+        App.fetchRoles();
 
         return App.bindEvents();
     },
 
     bindEvents: function() {
         $(document).on('click', App.handleButtonClick);
+
+        $("#role_farmer").on("change", (event) => {
+            const { addFarmer, renounceFarmer } = App.contracts.SupplyChain.methods;
+
+            if ($('#role_farmer').is(':checked')) {
+                addFarmer(
+                    App.metamaskAccountID
+                ).send({from: App.metamaskAccountID}).then(function (result) {
+                    App.fetchRoles();
+                    console.log('addFarmer', result);
+                }).catch(function (err) {
+                    console.log(err.message);
+                });
+            } else {
+                renounceFarmer().send({from: App.metamaskAccountID}).then(function (result) {
+                    App.fetchRoles();
+                    console.log('addFarmer', result);
+                }).catch(function (err) {
+                    console.log(err.message);
+                });
+            }
+        });
+
+
+        $("#role_distributor").on("change", (event) => {
+            const { addDistributor, renounceDistributor } = App.contracts.SupplyChain.methods;
+
+            if ($('#role_distributor').is(':checked')) {
+                addDistributor(
+                    App.metamaskAccountID
+                ).send({from: App.metamaskAccountID}).then(function (result) {
+                    App.fetchRoles();
+                }).catch(function (err) {
+                    console.log(err.message);
+                });
+            } else {
+                renounceDistributor().send({from: App.metamaskAccountID}).then(function (result) {
+                    App.fetchRoles();
+                }).catch(function (err) {
+                    console.log(err.message);
+                });
+            }
+        });
+
+
+        $("#role_retailer").on("change", (event) => {
+            const { addRetailer, renounceRetailer } = App.contracts.SupplyChain.methods;
+
+            if ($('#role_retailer').is(':checked')) {
+                addRetailer(
+                    App.metamaskAccountID
+                ).send({from: App.metamaskAccountID}).then(function (result) {
+                    App.fetchRoles();
+                }).catch(function (err) {
+                    console.log(err.message);
+                });
+            } else {
+                renounceRetailer().send({from: App.metamaskAccountID}).then(function (result) {
+                    App.fetchRoles();
+                }).catch(function (err) {
+                    console.log(err.message);
+                });
+            }
+        });
+
+
+        $("#role_consumer").on("change", (event) => {
+            const { addConsumer, renounceConsumer } = App.contracts.SupplyChain.methods;
+
+            if ($('#role_consumer').is(':checked')) {
+                addConsumer(
+                    App.metamaskAccountID
+                ).send({from: App.metamaskAccountID}).then(function (result) {
+                    App.fetchRoles();
+                }).catch(function (err) {
+                    console.log(err.message);
+                });
+            } else {
+                renounceConsumer().send({from: App.metamaskAccountID}).then(function (result) {
+                    App.fetchRoles();
+                }).catch(function (err) {
+                    console.log(err.message);
+                });
+            }
+        });
+
+        $("#harvest_button").on("click", (event) => {
+            event.preventDefault();
+
+            const { harvestItem } = App.contracts.SupplyChain.methods;
+
+            const _upc = $("#upc").val();
+            const originFarmerID = App.metamaskAccountID;
+            const originFarmName = $("#harvest_origin_farm_name").val();
+            const originFarmInformation = $("#harvest_origin_farm_information").val();
+            const originFarmLatitude = $("#harvest_origin_farm_latitude").val();
+            const originFarmLongitude = $("#harvest_origin_farm_longitude").val();
+            const productNotes = $("#harvest_origin_product_notes").val();
+
+            harvestItem(_upc, originFarmerID, originFarmName,
+                originFarmInformation, originFarmLatitude, originFarmLongitude,
+                productNotes).send({from: App.metamaskAccountID}).then(function (result) {
+                App.updateApp();
+            }).catch(function (err) {
+                console.log(err.message);
+            });
+        });
+
+        $("#process_button").on("click", (event) => {
+            event.preventDefault();
+
+            const { processItem } = App.contracts.SupplyChain.methods;
+
+            const _upc = $("#upc").val();
+
+            processItem(_upc).send({from: App.metamaskAccountID}).then(function (result) {
+                App.updateApp();
+            }).catch(function (err) {
+                console.log(err.message);
+            });
+        });
+
+        $("#pack_button").on("click", (event) => {
+            event.preventDefault();
+
+            const { packItem } = App.contracts.SupplyChain.methods;
+
+            const _upc = $("#upc").val();
+
+            packItem(_upc).send({from: App.metamaskAccountID}).then(function (result) {
+                App.updateApp();
+            }).catch(function (err) {
+                console.log(err.message);
+            });
+        });
+
+        $("#sell_button").on("click", (event) => {
+            event.preventDefault();
+
+            const { sellItem } = App.contracts.SupplyChain.methods;
+
+            const _upc = $("#upc").val();
+            const price = $("#sell_product_price").val();
+
+            sellItem(_upc, price).send({from: App.metamaskAccountID}).then(function (result) {
+                App.updateApp();
+            }).catch(function (err) {
+                console.log(err.message);
+            });
+        });
+
+        $("#buy_button").on("click", (event) => {
+            event.preventDefault();
+
+            const { buyItem } = App.contracts.SupplyChain.methods;
+
+            const _upc = $("#upc").val();
+            const price = $("#product_price").val();
+            console.log(price);
+
+            buyItem(_upc).send({from: App.metamaskAccountID, value: price}).then(function (result) {
+                App.updateApp();
+            }).catch(function (err) {
+                console.log(err.message);
+            });
+        });
+
+        $("#ship_button").on("click", (event) => {
+            event.preventDefault();
+
+            const { shipItem } = App.contracts.SupplyChain.methods;
+
+            const _upc = $("#upc").val();
+
+            shipItem(_upc).send({from: App.metamaskAccountID}).then(function (result) {
+                App.updateApp();
+            }).catch(function (err) {
+                console.log(err.message);
+            });
+        });
+
+        $("#receive_button").on("click", (event) => {
+            event.preventDefault();
+
+            const { receiveItem } = App.contracts.SupplyChain.methods;
+
+            const _upc = $("#upc").val();
+
+            receiveItem(_upc).send({from: App.metamaskAccountID}).then(function (result) {
+                App.updateApp();
+            }).catch(function (err) {
+                console.log(err.message);
+            });
+        });
+
+        $("#purchase_button").on("click", (event) => {
+            event.preventDefault();
+
+            const { purchaseItem } = App.contracts.SupplyChain.methods;
+
+            const _upc = $("#upc").val();
+
+            purchaseItem(_upc).send({from: App.metamaskAccountID}).then(function (result) {
+                App.updateApp();
+            }).catch(function (err) {
+                console.log(err.message);
+            });
+        });
     },
 
     handleButtonClick: async function(event) {
-        event.preventDefault();
 
         App.getMetaskAccountID();
 
         var processId = parseInt($(event.target).data('id'));
         console.log('processId',processId);
 
-        switch(processId) {
-            case 1:
-                return await App.harvestItem(event);
-                break;
-            case 2:
-                return await App.processItem(event);
-                break;
-            case 3:
-                return await App.packItem(event);
-                break;
-            case 4:
-                return await App.sellItem(event);
-                break;
-            case 5:
-                return await App.buyItem(event);
-                break;
-            case 6:
-                return await App.shipItem(event);
-                break;
-            case 7:
-                return await App.receiveItem(event);
-                break;
-            case 8:
-                return await App.purchaseItem(event);
-                break;
-            case 9:
-                return await App.fetchItemBufferOne(event);
-                break;
-            case 10:
-                return await App.fetchItemBufferTwo(event);
-                break;
-            }
+        App.updateApp();
     },
 
-    harvestItem: function(event) {
-        event.preventDefault();
-        var processId = parseInt($(event.target).data('id'));
-
-        const { harvestItem } = App.contracts.SupplyChain.methods;
-
-        harvestItem(
-                App.upc, 
-                App.metamaskAccountID, 
-                App.originFarmName, 
-                App.originFarmInformation, 
-                App.originFarmLatitude, 
-                App.originFarmLongitude, 
-                App.productNotes
-        ).send({from: App.metamaskAccountID}).then(function(result) {
-            $("#ftc-item").text(result);
-            console.log('harvestItem',result);
-        }).catch(function(err) {
-            console.log(err.message);
-        });
-    },
-
-    processItem: function (event) {
-        event.preventDefault();
-        var processId = parseInt($(event.target).data('id'));
-
-        const { processItem } = App.contracts.SupplyChain.methods;
-
-        processItem(App.upc).call({from: App.metamaskAccountID}).then(function(result) {
-            $("#ftc-item").text(result);
-            console.log('processItem',result);
-        }).catch(function(err) {
-            console.log(err.message);
-        });
-    },
-    
-    packItem: function (event) {
-        event.preventDefault();
-        var processId = parseInt($(event.target).data('id'));
-
-        const { packItem } = App.contracts.SupplyChain.methods;
-
-        packItem(App.upc).call({from: App.metamaskAccountID}).then(function(result) {
-            $("#ftc-item").text(result);
-            console.log('packItem',result);
-        }).catch(function(err) {
-            console.log(err.message);
-        });
-    },
-
-    sellItem: function (event) {
-        event.preventDefault();
-        var processId = parseInt($(event.target).data('id'));
-
-        const { sellItem } = App.contracts.SupplyChain.methods;
-
-        const productPrice = web3.toWei(1, "ether");
-        console.log('productPrice',productPrice);
-        sellItem(App.upc, App.productPrice).call({from: App.metamaskAccountID}).then(function(result) {
-            $("#ftc-item").text(result);
-            console.log('sellItem',result);
-        }).catch(function(err) {
-            console.log(err.message);
-        });
-    },
-
-    buyItem: function (event) {
-        event.preventDefault();
-        var processId = parseInt($(event.target).data('id'));
-
-        const { buyItem } = App.contracts.SupplyChain.methods;
-
-        const walletValue = web3.toWei(3, "ether");
-        return buyItem(App.upc).call({from: App.metamaskAccountID, value: walletValue}).then(function(result) {
-            $("#ftc-item").text(result);
-            console.log('buyItem',result);
-        }).catch(function(err) {
-            console.log(err.message);
-        });
-    },
-
-    shipItem: function (event) {
-        event.preventDefault();
-        var processId = parseInt($(event.target).data('id'));
-
-        const { shipItem } = App.contracts.SupplyChain.methods;
-
-        shipItem(App.upc).call({from: App.metamaskAccountID}).then(function(result) {
-            $("#ftc-item").text(result);
-            console.log('shipItem',result);
-        }).catch(function(err) {
-            console.log(err.message);
-        });
-    },
-
-    receiveItem: function (event) {
-        event.preventDefault();
-        var processId = parseInt($(event.target).data('id'));
-
-        const { receiveItem } = App.contracts.SupplyChain.methods;
-
-        receiveItem(App.upc).call({from: App.metamaskAccountID}).then(function(result) {
-            $("#ftc-item").text(result);
-            console.log('receiveItem',result);
-        }).catch(function(err) {
-            console.log(err.message);
-        });
-    },
-
-    purchaseItem: function (event) {
-        event.preventDefault();
-        var processId = parseInt($(event.target).data('id'));
-
-        const { purchaseItem } = App.contracts.SupplyChain.methods;
-
-        purchaseItem(App.upc).call({from: App.metamaskAccountID}).then(function(result) {
-            $("#ftc-item").text(result);
-            console.log('purchaseItem',result);
-        }).catch(function(err) {
-            console.log(err.message);
-        });
+    updateApp: function() {
+        App.fetchItemBufferOne();
+        App.fetchItemBufferTwo();
+        App.fetchRoles();
+        App.fetchEvents();
     },
 
     fetchItemBufferOne: function () {
-    ///   event.preventDefault();
-    ///    var processId = parseInt($(event.target).data('id'));
         App.upc = $('#upc').val();
         console.log('upc',App.upc);
 
         const { fetchItemBufferOne } = App.contracts.SupplyChain.methods;
 
         fetchItemBufferOne(App.upc).call().then(function(result) {
-          $("#ftc-item").text(result);
-          console.log('fetchItemBufferOne', result);
+            $("#owner_id").val(result.ownerID);
+            $("#origin_farmer_id").val(result.originFarmerID);
+            $("#origin_farm_name").val(result.originFarmName);
+            $("#origin_farm_latitude").val(result.originFarmLatitude);
+            $("#origin_farm_longitude").val(result.originFarmLongitude);
+
+            M.updateTextFields();
+
+            App.currentItemExists = result.ownerID !== App.emptyAddress;
+
+            App.updateActionsUI();
+
+            console.log('fetchItemBufferOne', result);
         }).catch(function(err) {
           console.log(err.message);
         });
     },
 
     fetchItemBufferTwo: function () {
-    ///    event.preventDefault();
-    ///    var processId = parseInt($(event.target).data('id'));
-
         const { fetchItemBufferTwo } = App.contracts.SupplyChain.methods;
 
         fetchItemBufferTwo(App.upc).call().then(function(result) {
-          $("#ftc-item").text(result);
-          console.log('fetchItemBufferTwo', result);
+
+            $("#product_id").val(result.productID);
+            $("#product_notes").val(result.productNotes);
+            $("#product_price").val(result.productPrice);
+            $("#item_state").val(result.itemState);
+
+            $("#distributer_id").val(result.distributorID);
+            $("#retailer_id").val(result.retailerID);
+            $("#consumer_id").val(result.consumerID);
+
+            App.currentProductState = result.itemState;
+
+            App.updateActionsUI();
+
+            M.updateTextFields();
+
+            console.log('fetchItemBufferTwo', result);
         }).catch(function(err) {
           console.log(err.message);
+        });
+    },
+
+    fetchRoles: function() {
+        const { isFarmer, isConsumer, isDistributor, isRetailer } = App.contracts.SupplyChain.methods;
+        console.log(App.contracts.SupplyChain.methods);
+
+        Promise.all([
+            isFarmer(App.metamaskAccountID).call(),
+            isConsumer(App.metamaskAccountID).call(),
+            isDistributor(App.metamaskAccountID).call(),
+            isRetailer(App.metamaskAccountID).call()
+        ]).then(function(results) {
+            $('#role_farmer').prop('checked', results[0]);
+            $('#role_consumer').prop('checked', results[1]);
+            $('#role_distributor').prop('checked', results[2]);
+            $('#role_retailer').prop('checked', results[3]);
+
+            M.updateTextFields();
+
+            App.updateActionsUI();
+
+            console.log('fetchRoles', results);
+        }).catch(function(err) {
+            console.log(err.message);
         });
     },
 
@@ -329,10 +399,92 @@ const App = {
         }
 
         App.contracts.SupplyChain.events.allEvents(function(err, log){
-            if (!err)
-                $("#ftc-events").append('<li>' + log.event + ' - ' + log.transactionHash + '</li>');
+            //if (!err)
+                //$("#ftc-events").append('<li>' + log.event + ' - ' + log.transactionHash + '</li>');
         });
 
+    },
+
+    updateActionsUI: function () {
+        $("#no_farmer_info").hide();
+        $("#no_distributor_info").hide();
+        $("#no_retailer_info").hide();
+        $("#no_consumer_info").hide();
+
+        $("#harvest_form").hide();
+        $("#process_form").hide();
+        $("#pack_form").hide();
+        $("#sell_form").hide();
+        $("#buy_form").hide();
+        $("#ship_form").hide();
+        $("#receive_form").hide();
+        $("#purchase_form").hide();
+
+        $("#farmer_done_form").hide();
+        $("#distributor_done_form").hide();
+        $("#retailer_done_form").hide();
+        $("#consumer_done_form").hide();
+
+        if ($('#role_farmer').is(':checked')) {
+            // Farmer
+            if (!App.currentItemExists) {
+                $("#harvest_form").show();
+            } else {
+                if (App.currentProductState == 0) {
+                    $("#process_form").show();
+                } else if (App.currentProductState == 1) {
+                    $("#pack_form").show();
+                } else if (App.currentProductState == 2) {
+                    $("#sell_form").show();
+                }
+
+                if (App.currentProductState > 2) {
+                    $("#farmer_done_form").show();
+                }
+            }
+        } else {
+            $("#no_farmer_info").show();
+        }
+
+        if ($('#role_distributor').is(':checked')) {
+            if (App.currentProductState == 3) {
+                $("#buy_form").show();
+            }
+
+            if (App.currentProductState == 4) {
+                $("#ship_form").show();
+            }
+
+            if (App.currentProductState > 4) {
+                $("#distributor_done_form").show();
+            }
+        } else {
+            $("#no_distributor_info").show();
+        }
+
+        if ($('#role_retailer').is(':checked')) {
+            if (App.currentProductState == 5) {
+                $("#receive_form").show();
+            }
+
+            if (App.currentProductState > 5) {
+                $("#retailer_done_form").show();
+            }
+        } else {
+            $("#no_retailer_info").show();
+        }
+
+        if ($('#role_consumer').is(':checked')) {
+            if (App.currentProductState == 6) {
+                $("#purchase_form").show();
+            }
+
+            if (App.currentProductState > 6) {
+                $("#consumer_done_form").show();
+            }
+        } else {
+            $("#no_consumer_info").show();
+        }
     }
 };
 
